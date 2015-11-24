@@ -10,9 +10,10 @@ public class Command implements Serializable {
 	public static final int cmdUnknown = 0x0000;
 	
 	public static final int cmdPressHome = 0x0001;
+	public static final int cmdPressBack = 0x0002;
 	
 	public static final int cmdGetLayout = 0x1001;
-	@Deprecated  //uiautomaot不支持这个方法
+	@Deprecated  //uiautomaot涓嶆敮鎸佽繖涓柟娉�
 	public static final int cmdGetActivity = 0x1002;
 	public static final int cmdGetPackage = 0x1003;
 	

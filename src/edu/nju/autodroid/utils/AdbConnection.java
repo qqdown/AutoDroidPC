@@ -10,7 +10,7 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.TimeoutException;
 
 import edu.nju.autodroid.Command;
-import edu.nju.autodroid.activity.ActivityNode;
+import edu.nju.autodroid.activity.ActivityLayoutNode;
 
 public class AdbConnection {
 	private static Socket mSocket;
@@ -52,7 +52,7 @@ public class AdbConnection {
 		}
 	}
 	
-	//读取命令，为同步函数，会一直阻塞知道得到数据
+	//璇诲彇鍛戒护锛屼负鍚屾鍑芥暟锛屼細涓�鐩撮樆濉炵煡閬撳緱鍒版暟鎹�
 	public static Command receiveCommand(){
 		 try {
 			if(ois == null)
@@ -65,9 +65,9 @@ public class AdbConnection {
 	}
 	
 	/*
-	 * 获取简单的命令结果
-	 * 命令仅仅包含一个cmd，无任何其它参数
-	 * 结果包含且仅包含一个String param，
+	 * 鑾峰彇绠�鍗曠殑鍛戒护缁撴灉
+	 * 鍛戒护浠呬粎鍖呭惈涓�涓猚md锛屾棤浠讳綍鍏跺畠鍙傛暟
+	 * 缁撴灉鍖呭惈涓斾粎鍖呭惈涓�涓猄tring param锛�
 	 */
 	private static String getSimpleString(int cmdI){
 		Command cmd = new Command();
@@ -86,10 +86,18 @@ public class AdbConnection {
 		cmd = receiveCommand();
 	}
 	
+	public static void pressBack(){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdPressBack;
+		sendCommand(cmd);
+		cmd = receiveCommand();
+	}
+	
 	public static String getLayout(){
 		return getSimpleString(Command.cmdGetLayout);
 	}
 	
+	@Deprecated
 	public static String getActivity(){
 		return getSimpleString(Command.cmdGetActivity);
 	}
@@ -98,7 +106,7 @@ public class AdbConnection {
 		return getSimpleString(Command.cmdGetPackage);
 	}
 	
-	public static boolean doClick(ActivityNode btn){
+	public static boolean doClick(ActivityLayoutNode btn){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoClick;
 		cmd.params = new String[]{btn.indexXpath};
@@ -107,7 +115,7 @@ public class AdbConnection {
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
 	
-	public static boolean doSetText(ActivityNode node, String content){
+	public static boolean doSetText(ActivityLayoutNode node, String content){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoSetText;
 		cmd.params = new String[]{node.indexXpath, content};
@@ -116,7 +124,7 @@ public class AdbConnection {
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
 	
-	public static boolean doLongClick(ActivityNode node){
+	public static boolean doLongClick(ActivityLayoutNode node){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoLongClick;
 		cmd.params = new String[]{node.indexXpath};

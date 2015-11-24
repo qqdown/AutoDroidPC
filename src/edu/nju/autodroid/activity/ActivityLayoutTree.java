@@ -3,9 +3,11 @@ package edu.nju.autodroid.activity;
 import java.io.ByteArrayInputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,12 +23,14 @@ import org.w3c.dom.NodeList;
 import edu.nju.autodroid.utils.Logger;
 
 
-public class ActivityTree 
+public class ActivityLayoutTree 
 {
-	private ActivityNode root;//root node has empty content
+	private ActivityLayoutNode root;//root node has empty content
 	
-	public ActivityTree(String activityXML){
-		root = new ActivityNode();
+	private List<ActivityLayoutNode> findList = new ArrayList<ActivityLayoutNode>();
+	
+	public ActivityLayoutTree(String activityXML){
+		root = new ActivityLayoutNode();
 		try{
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -39,7 +43,7 @@ public class ActivityTree
 			for(int i=0; i<nodes.getLength(); i++){
 				Node node = nodes.item(i);
 				if(node != null && node.getNodeType() == Node.ELEMENT_NODE){
-					ActivityNode an = parseActivityNode(node);
+					ActivityLayoutNode an = parseActivityNode(node);
 					an.indexXpath = an.index + "";
 					root.addChild(an);
 					createActivityTree(node, an);
@@ -50,27 +54,45 @@ public class ActivityTree
 		}
 	}
 	
-	public ActivityNode getRoot(){
+	public ActivityLayoutNode getRoot(){
 		return root;
 	}
 	
-	public void forAll(Consumer<ActivityNode> consumer){
-		for(ActivityNode n: root.children){
+	public void forAll(Consumer<ActivityLayoutNode> consumer){
+		for(ActivityLayoutNode n: root.children){
 			forAll(n, consumer);
 		}
 	}
 	
-	private void forAll(ActivityNode node, Consumer<ActivityNode> consumer){
+	private void forAll(ActivityLayoutNode node, Consumer<ActivityLayoutNode> consumer){
 		if(node == null)
 			return;
 		consumer.accept(node);
-		for(ActivityNode n: node.children){
+		for(ActivityLayoutNode n: node.children){
 			forAll(n, consumer);
 		}
 	}
 	
-	private ActivityNode parseActivityNode(Node node){
-		ActivityNode anode = new ActivityNode();
+	public List<ActivityLayoutNode> findAll(Predicate<ActivityLayoutNode> predicate){
+		findList.clear();
+		for(ActivityLayoutNode n: root.children){
+			findAll(n, predicate);
+		}
+		return findList;
+	}
+	
+	private void findAll(ActivityLayoutNode node, Predicate<ActivityLayoutNode> predicate){
+		if(node == null)
+			return;
+		if(predicate.test(node))
+			findList.add(node);
+		for(ActivityLayoutNode n: node.children){
+			findAll(n, predicate);
+		}
+	}
+	
+	private ActivityLayoutNode parseActivityNode(Node node){
+		ActivityLayoutNode anode = new ActivityLayoutNode();
 		NamedNodeMap nnm = node.getAttributes();
 		anode.index = Integer.parseInt(nnm.getNamedItem("index").getNodeValue());
 		anode.text = nnm.getNamedItem("text").getNodeValue();
@@ -100,7 +122,7 @@ public class ActivityTree
 		return anode;
 	}
 	
-	private void createActivityTree(Node curNode, ActivityNode parent){
+	private void createActivityTree(Node curNode, ActivityLayoutNode parent){
 		if(curNode == null)
 			return;
 		NodeList nodes = curNode.getChildNodes();
@@ -109,7 +131,7 @@ public class ActivityTree
 		for(int i=0; i<nodes.getLength(); i++){
 			Node node = nodes.item(i);
 			if(node != null && node.getNodeType() == Node.ELEMENT_NODE){
-				ActivityNode an = parseActivityNode(node);
+				ActivityLayoutNode an = parseActivityNode(node);
 				an.indexXpath = parent.indexXpath + " " + an.index;
 				parent.addChild(an);
 				createActivityTree(node, an);
@@ -118,17 +140,17 @@ public class ActivityTree
 	}
 	
 	public void print(){
-		for(ActivityNode n : root.children){
+		for(ActivityLayoutNode n : root.children){
 			print(n, 0);
 		}
 	}
 	
-	private void print(ActivityNode node, int depth){
+	private void print(ActivityLayoutNode node, int depth){
 		for(int i=0; i<depth; i++){
 			System.out.print(" ");
 		}
 		System.out.println(node.indexXpath + " " + node.toString());
-		for(ActivityNode n : node.children){
+		for(ActivityLayoutNode n : node.children){
 			print(n, depth+1);
 		}
 	}

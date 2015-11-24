@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.graphics.Rect;
 
-public class ActivityNode {
+public class ActivityLayoutNode {
 	public int index;
 	public String text;
 	public String className;
@@ -25,16 +25,16 @@ public class ActivityNode {
 	public String indexXpath;
 	public int callIndex;
 	
-	public ActivityNode parent;
-	public List<ActivityNode> children;
+	public ActivityLayoutNode parent;
+	public List<ActivityLayoutNode> children;
 	
-	public ActivityNode(){
+	public ActivityLayoutNode(){
 		callIndex = 0;
 		bound = new int[4];
-		children = new ArrayList<ActivityNode>();
+		children = new ArrayList<ActivityLayoutNode>();
 	}
 	
-	public void addChild(ActivityNode child){
+	public void addChild(ActivityLayoutNode child){
 		children.add(child);
 	}
 

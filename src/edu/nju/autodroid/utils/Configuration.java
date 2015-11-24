@@ -26,14 +26,18 @@ public class Configuration {
 		}
 	}
 	
-	public static String getProperty(String key)
+	protected static String getProperty(String key)
 	{
 		return prop.getProperty(key);
 	}
 	
-	public static String getAndroidSDKPath()
+	protected static String getAndroidSDKPath()
 	{
 		return prop.getProperty("android_sdk_path");
+	}
+	
+	protected static String getAntRootPath(){
+		return prop.getProperty("ant_root_path");
 	}
 	
 	public static String getADBPath()
@@ -48,5 +52,11 @@ public class Configuration {
 		if(System.getProperty("os.name").contains("linux"))
 			return getAndroidSDKPath() + "/tools/android";
 		return getAndroidSDKPath() + "/tools/android.bat";
+	}
+	
+	public static String getAntPath(){
+		if(System.getProperty("os.name").contains("linux"))
+			return getAntRootPath() + "/bin/ant";
+		return getAntRootPath() + "/bin/ant.bat";
 	}
 }

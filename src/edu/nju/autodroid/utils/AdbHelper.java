@@ -153,7 +153,6 @@ public abstract class AdbHelper
 			@Override
 			public void flush() {
 				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
