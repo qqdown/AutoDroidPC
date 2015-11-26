@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -20,6 +21,8 @@ import com.android.uiautomator.core.UiDevice;
 import com.android.uiautomator.core.UiSelector;
 import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
+import android.app.ActivityManager;
+import android.app.NativeActivity;
 import android.graphics.Rect;
 import edu.nju.autodroid.activity.ActivityLayoutNode;
 import edu.nju.autodroid.activity.ActivityLayoutTree;
@@ -35,11 +38,16 @@ public class PCMain {
     public static int PHONE_PORT = 22222;  
 
 	public static void main(String[] args) throws TimeoutException, AdbCommandRejectedException, IOException, InterruptedException, ShellCommandUnresponsiveException {
-
-		Logger.initalize("logger.txt");
+		//ActivityManager am;
+	
+		Logger.initalize(null);
 		AdbHelper.initializeBridge();
-
+		//AdbHelper.installApk("F:\\OtherProject\\°²×¿µÁ°æ¼ì²â\\MyAndroid2.apk");
 		AdbConnection.initializeConnection(PC_LOCAL_PORT, PHONE_PORT);
+		//AdbHelper.startActivity("com.android.browser/.BrowserActivity");
+		List<String> activityHeap = AdbHelper.getRunningActivities();
+		System.out.println(activityHeap.toString());
+		/*
 		int count = 100;
 		String packageName = AdbConnection.getPackage();
 		Logger.logInfo("package "  + packageName);
@@ -69,7 +77,7 @@ public class PCMain {
 			Logger.logInfo("click " + node.className + " " + node.text);
 			//Thread.sleep(500);
 		}
-		
+		*/
 		AdbHelper.terminateBridge();
 		Logger.endLogging();
 	}

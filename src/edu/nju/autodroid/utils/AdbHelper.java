@@ -1,11 +1,13 @@
 package edu.nju.autodroid.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.AndroidDebugBridge;
@@ -13,10 +15,11 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
+import com.android.ddmlib.log.LogReceiver;
+import com.android.ddmlib.log.LogReceiver.ILogListener;
+import com.android.ddmlib.log.LogReceiver.LogEntry;
 
-
-
-public abstract class AdbHelper 
+public class AdbHelper 
 {
 	//鐢ㄤ簬鍚屾
 	private static Object sSync = new Object();
@@ -27,7 +30,6 @@ public abstract class AdbHelper
 	
 	protected AdbHelper()
 	{
-		
 	}
 	
 	public static boolean initializeBridge() {
@@ -139,6 +141,13 @@ public abstract class AdbHelper
 		}
 	}
 	
+	public static void installApk(String apkFilePath){
+		File apkFile = new File(apkFilePath);
+		if(!apkFile.exists())
+			return;
+		CmdExecutor.execCmd(Configuration.getADBPath() + " install -r " + apkFile.getAbsolutePath());
+	}
+	
 	public static String getFocusedActivity() throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException{
 		IDevice device = getDevice();
 		final String[] result = new String[1];
@@ -169,8 +178,90 @@ public abstract class AdbHelper
 		return result[0];
 	}
 	
-	public static void StartActivity(String activityName){
+	public static void startActivity(String activityName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException{
 		IDevice device = getDevice();
+		device.executeShellCommand("am start -n " + activityName, new  IShellOutputReceiver() {
+			
+			@Override
+			public boolean isCancelled() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void flush() {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void addOutput(byte[] arg0, int arg1, int arg2) {
+				String output = new String(arg0);
+				System.out.println("start activity: " + output);
+			}
+		});
+		
+	}
+	
+	public static void stopApplication(String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException{
+		IDevice device = getDevice();
+		device.executeShellCommand("am force-stop " + packageName, new  IShellOutputReceiver() {
+			
+			@Override
+			public boolean isCancelled() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void flush() {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void addOutput(byte[] arg0, int arg1, int arg2) {
+				String output = new String(arg0);
+				System.out.println("stop application: " + output);
+			}
+		});
+	}
+	
+	//获取当前正在运行的Activity，返回包含Activity名的List，顺序为运行栈顶-》栈底
+	public static List<String>  getRunningActivities() throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+		IDevice device = getDevice();
+		final List<String> result = new ArrayList<String>();
+		device.executeShellCommand("dumpsys activity | grep 'Run #'", new  IShellOutputReceiver() {
+			
+			@Override
+			public boolean isCancelled() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void flush() {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void addOutput(byte[] arg0, int arg1, int arg2) {
+				String output = new String(arg0);
+				String[] lines = output.split("\n");
+				
+				for(int i=0; i<lines.length; i++){
+					String line = lines[i];
+					if(line.isEmpty())
+						continue;
+					int l,r;
+					l = line.indexOf("{");
+					r = line.indexOf("}");
+					if(l<0 || r<0)
+						continue;
+					result.add(line.substring(l+1,r).split(" ")[2]);
+				}
+			}
+		});
+
+		return result;
 	}
 	
 	public static void terminateBridge()
