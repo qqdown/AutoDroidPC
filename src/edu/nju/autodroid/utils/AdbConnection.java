@@ -132,4 +132,19 @@ public class AdbConnection {
 		cmd = receiveCommand();
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
+	
+	//默认55步 每步5ms
+	public static boolean doScrollBackward(ActivityLayoutNode node){
+		return doScrollBackward(node, 55);
+	}
+	
+	//每步5ms
+	public static boolean doScrollBackward(ActivityLayoutNode node, int steps){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdDoScrollBackward;
+		cmd.params = new String[]{node.indexXpath, steps+""};
+		sendCommand(cmd);
+		cmd = receiveCommand();
+		return Boolean.parseBoolean(cmd.params[0]);
+	}
 }

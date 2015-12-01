@@ -5,7 +5,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -20,6 +22,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import edu.nju.autodroid.utils.Algorithm;
 import edu.nju.autodroid.utils.Logger;
 
 
@@ -28,18 +31,21 @@ public class ActivityLayoutTree
 	private ActivityLayoutNode root;//root node has empty content
 	
 	private List<ActivityLayoutNode> findList = new ArrayList<ActivityLayoutNode>();
+	private String layoutXML;
 	
-	public ActivityLayoutTree(String activityXML){
+	public ActivityLayoutTree(String layoutXML){
 		root = new ActivityLayoutNode();
 		try{
+			this.layoutXML = layoutXML;
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = dbf.newDocumentBuilder();
-			Document doc = builder.parse(new ByteArrayInputStream(activityXML.getBytes("utf-8")));
+			Document doc = builder.parse(new ByteArrayInputStream(layoutXML.getBytes("utf-8")));
 			Element rootEle = doc.getDocumentElement();
 			if(rootEle == null)
 				return;
 			NodeList nodes = rootEle.getChildNodes();
 			if(nodes==null) return;
+			root.totalChildrenCount += nodes.getLength();
 			for(int i=0; i<nodes.getLength(); i++){
 				Node node = nodes.item(i);
 				if(node != null && node.getNodeType() == Node.ELEMENT_NODE){
@@ -47,8 +53,10 @@ public class ActivityLayoutTree
 					an.indexXpath = an.index + "";
 					root.addChild(an);
 					createActivityTree(node, an);
+					root.totalChildrenCount += an.totalChildrenCount;
 				}
 			}
+			
 		}catch(Exception e){
 			Logger.logException(e);
 		}
@@ -91,6 +99,10 @@ public class ActivityLayoutTree
 		}
 	}
 	
+	public String getLayoutXML(){
+		return layoutXML;
+	}
+	
 	private ActivityLayoutNode parseActivityNode(Node node){
 		ActivityLayoutNode anode = new ActivityLayoutNode();
 		NamedNodeMap nnm = node.getAttributes();
@@ -128,6 +140,7 @@ public class ActivityLayoutTree
 		NodeList nodes = curNode.getChildNodes();
 		if(nodes == null)
 			return;
+		parent.totalChildrenCount += nodes.getLength();
 		for(int i=0; i<nodes.getLength(); i++){
 			Node node = nodes.item(i);
 			if(node != null && node.getNodeType() == Node.ELEMENT_NODE){
@@ -135,6 +148,7 @@ public class ActivityLayoutTree
 				an.indexXpath = parent.indexXpath + " " + an.index;
 				parent.addChild(an);
 				createActivityTree(node, an);
+				parent.totalChildrenCount += an.totalChildrenCount;
 			}
 		}
 	}
@@ -153,5 +167,39 @@ public class ActivityLayoutTree
 		for(ActivityLayoutNode n : node.children){
 			print(n, depth+1);
 		}
+	}
+	
+	/*
+	 * 计算和另一个layoutTree的相似度
+	 * 
+	 */
+	public double similarityWith(ActivityLayoutTree layoutTree){
+		if(layoutTree.layoutXML.equals(this.layoutXML))
+			return 1.0;
+		
+		int editDis = Algorithm.EditDistance(getTreeBFSHashes(), layoutTree.getTreeBFSHashes());
+		return 1.0-editDis*1.0/root.totalChildrenCount;
+	}
+	
+	protected Integer[] getTreeBFSHashes(){
+		Integer[] hashes = new Integer[root.totalChildrenCount];
+		int i=0;
+		Queue<ActivityLayoutNode> nodeQueue = new LinkedList<ActivityLayoutNode>();
+		for(ActivityLayoutNode n : root.children){
+			nodeQueue.offer(n);
+		}
+		
+		while(!nodeQueue.isEmpty()){
+			ActivityLayoutNode cn = nodeQueue.poll();
+			//当出现TreeView时，我们不管内部的结构
+			if(!cn.className.contains("TreeView")){
+				for(ActivityLayoutNode n : cn.children){
+					nodeQueue.offer(n);
+				}
+			}
+			hashes[i++] = cn.className.hashCode();
+		}
+		
+		return hashes;
 	}
 }

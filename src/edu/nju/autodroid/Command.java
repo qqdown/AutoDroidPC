@@ -21,7 +21,8 @@ public class Command implements Serializable {
 	public static final int cmdDoSetText = 0x2002;
 	public static final int cmdDoLongClick = 0x2003;
 	
-	public static final int cmdDoScrollBack = 0x2101;
+	public static final int cmdDoScrollBackward = 0x2101;
+	public static final int cmdDoScrollForward = 0x2102;
 	
 	public Command(){
 		params = null;

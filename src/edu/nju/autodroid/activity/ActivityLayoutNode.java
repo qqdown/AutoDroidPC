@@ -27,9 +27,11 @@ public class ActivityLayoutNode {
 	
 	public ActivityLayoutNode parent;
 	public List<ActivityLayoutNode> children;
+	public int totalChildrenCount = 0;
 	
 	public ActivityLayoutNode(){
 		callIndex = 0;
+		totalChildrenCount = 0;
 		bound = new int[4];
 		children = new ArrayList<ActivityLayoutNode>();
 	}
@@ -62,5 +64,14 @@ public class ActivityLayoutNode {
 		str += "selected=" + selected + " ";
 		str += "bound=[" + bound[0] + "," + bound[1] + "][" + bound[2] + "," + bound[3] + "]";
 		return str;
+	}
+	
+	public double similarityWith(ActivityLayoutNode node){
+		if(node == null)
+			return 0;
+		if(node.className.equals(this.className))
+			return 1;
+		
+		return 0;
 	}
 }

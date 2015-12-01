@@ -1,6 +1,8 @@
 package edu.nju.autodroid;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -28,6 +30,7 @@ import edu.nju.autodroid.activity.ActivityLayoutNode;
 import edu.nju.autodroid.activity.ActivityLayoutTree;
 import edu.nju.autodroid.utils.AdbConnection;
 import edu.nju.autodroid.utils.AdbHelper;
+import edu.nju.autodroid.utils.Algorithm;
 import edu.nju.autodroid.utils.CmdExecutor;
 import edu.nju.autodroid.utils.Configuration;
 import edu.nju.autodroid.utils.Logger;
@@ -42,43 +45,42 @@ public class PCMain {
 	
 		Logger.initalize(null);
 		AdbHelper.initializeBridge();
-		//AdbHelper.installApk("F:\\OtherProject\\°²×¿µÁ°æ¼ì²â\\MyAndroid2.apk");
 		AdbConnection.initializeConnection(PC_LOCAL_PORT, PHONE_PORT);
-		//AdbHelper.startActivity("com.android.browser/.BrowserActivity");
-		List<String> activityHeap = AdbHelper.getRunningActivities();
-		System.out.println(activityHeap.toString());
-		/*
-		int count = 100;
-		String packageName = AdbConnection.getPackage();
-		Logger.logInfo("package "  + packageName);
-		while(true)
-		{
-			Logger.logInfo("Activity " + AdbHelper.getFocusedActivity());
-			if(!AdbHelper.getFocusedActivity().contains(packageName))
-			{
-				AdbConnection.pressBack();
-				if(!AdbHelper.getFocusedActivity().contains(packageName))
-					break;
-			}
-			ActivityLayoutTree curAT = new ActivityLayoutTree(AdbConnection.getLayout());
-			List<ActivityLayoutNode> clickableNodes = curAT.findAll(new Predicate<ActivityLayoutNode>() {
-				@Override
-				public boolean test(ActivityLayoutNode t) {
-					return t.clickable;
-				}
-			});
-			
-			if(clickableNodes.size() == 0)
+
+		
+		ActivityLayoutTree at = new ActivityLayoutTree(AdbConnection.getLayout());
+		int count = 0;
+		while(true){
+			ActivityLayoutTree at1 = new ActivityLayoutTree(AdbConnection.getLayout());
+			System.out.println(at1.getRoot().totalChildrenCount + "");
+			System.out.println(at.similarityWith(at1));
+			Thread.sleep(1000);
+			if(count++>100)
 				break;
-			
-			int randI = new Random().nextInt(clickableNodes.size());
-			ActivityLayoutNode node = clickableNodes.get(randI);
-			AdbConnection.doClick(node);
-			Logger.logInfo("click " + node.className + " " + node.text);
-			//Thread.sleep(500);
 		}
-		*/
+		
 		AdbHelper.terminateBridge();
 		Logger.endLogging();
+	}
+	
+	private static String readFromFile(String fileName){
+		String content = "";
+		
+		File file = new File(fileName);
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			byte[] bs = new byte[fis.available()];
+			fis.read(bs);
+			fis.close();
+			content = new String(bs);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return content;
 	}
 }
