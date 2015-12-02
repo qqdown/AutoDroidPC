@@ -10,7 +10,7 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.TimeoutException;
 
 import edu.nju.autodroid.Command;
-import edu.nju.autodroid.activity.ActivityLayoutNode;
+import edu.nju.autodroid.activity.LayoutNode;
 
 public class AdbConnection {
 	private static Socket mSocket;
@@ -52,14 +52,17 @@ public class AdbConnection {
 		}
 	}
 	
-	//璇诲彇鍛戒护锛屼负鍚屾鍑芥暟锛屼細涓�鐩撮樆濉炵煡閬撳緱鍒版暟鎹�
+	/**
+	 * 接受并返回命令，该命令为阻塞函数，直到收到命令才返回。
+	 * @return
+	 */
 	public static Command receiveCommand(){
 		 try {
 			if(ois == null)
 				ois = new ObjectInputStream(mSocket.getInputStream());
 			return (Command)ois.readObject();
 		} catch (ClassNotFoundException | IOException e) {
-			System.out.println("server error " + e.getMessage());
+			System.out.println("PC error " + e.getMessage());
 			return null;
 		}
 	}
@@ -106,7 +109,7 @@ public class AdbConnection {
 		return getSimpleString(Command.cmdGetPackage);
 	}
 	
-	public static boolean doClick(ActivityLayoutNode btn){
+	public static boolean doClick(LayoutNode btn){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoClick;
 		cmd.params = new String[]{btn.indexXpath};
@@ -115,7 +118,7 @@ public class AdbConnection {
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
 	
-	public static boolean doSetText(ActivityLayoutNode node, String content){
+	public static boolean doSetText(LayoutNode node, String content){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoSetText;
 		cmd.params = new String[]{node.indexXpath, content};
@@ -124,7 +127,7 @@ public class AdbConnection {
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
 	
-	public static boolean doLongClick(ActivityLayoutNode node){
+	public static boolean doLongClick(LayoutNode node){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoLongClick;
 		cmd.params = new String[]{node.indexXpath};
@@ -134,12 +137,12 @@ public class AdbConnection {
 	}
 	
 	//默认55步 每步5ms
-	public static boolean doScrollBackward(ActivityLayoutNode node){
+	public static boolean doScrollBackward(LayoutNode node){
 		return doScrollBackward(node, 55);
 	}
 	
 	//每步5ms
-	public static boolean doScrollBackward(ActivityLayoutNode node, int steps){
+	public static boolean doScrollBackward(LayoutNode node, int steps){
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoScrollBackward;
 		cmd.params = new String[]{node.indexXpath, steps+""};

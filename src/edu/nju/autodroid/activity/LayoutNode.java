@@ -3,9 +3,8 @@ package edu.nju.autodroid.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.graphics.Rect;
 
-public class ActivityLayoutNode {
+public class LayoutNode {
 	public int index;
 	public String text;
 	public String className;
@@ -22,21 +21,28 @@ public class ActivityLayoutNode {
 	public boolean password;
 	public boolean selected;
 	public int[] bound;
-	public String indexXpath;
+	public String indexXpath;//节点在树中xPath
 	public int callIndex;
 	
-	public ActivityLayoutNode parent;
-	public List<ActivityLayoutNode> children;
+	public LayoutNode parent;
+	public List<LayoutNode> children;
 	public int totalChildrenCount = 0;
 	
-	public ActivityLayoutNode(){
+	//用于行为计数
+	public int clickedCount;
+	public int longClickedCount;
+	public int scrolledCount;
+
+	
+	public LayoutNode(){
+		resetActionCount();
 		callIndex = 0;
 		totalChildrenCount = 0;
 		bound = new int[4];
-		children = new ArrayList<ActivityLayoutNode>();
+		children = new ArrayList<LayoutNode>();
 	}
 	
-	public void addChild(ActivityLayoutNode child){
+	public void addChild(LayoutNode child){
 		children.add(child);
 	}
 
@@ -66,12 +72,32 @@ public class ActivityLayoutNode {
 		return str;
 	}
 	
-	public double similarityWith(ActivityLayoutNode node){
+	public double similarityWith(LayoutNode node){
 		if(node == null)
 			return 0;
 		if(node.className.equals(this.className))
 			return 1;
 		
 		return 0;
+	}
+	
+	/**
+	 * 与equals不同，当node之间的className和text（不为空）相同时，返回true
+	 * @param node
+	 * @return 当node之间的className和text（不为空）相同时，返回true
+	 */
+	public boolean equalWith(LayoutNode node){
+		if(node == null)
+			return false;
+		if(node.className.equals(className) || (!node.text.isEmpty() && node.text.equals(text)))
+			return true;
+		else
+			return false;
+	}
+	
+	public void resetActionCount(){
+		clickedCount = 0;
+		longClickedCount = 0;
+		scrolledCount = 0;
 	}
 }

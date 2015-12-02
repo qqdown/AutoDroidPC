@@ -171,6 +171,8 @@ public class AdbHelper
 				int i1,i2;
 				i1 = output.indexOf('{');
 				i2 = output.indexOf('}');
+				if(i1<0 || i2<0)
+					return;
 				output = output.substring(i1+1, i2);
 				result[0] = output.split(" ")[2];
 			}
