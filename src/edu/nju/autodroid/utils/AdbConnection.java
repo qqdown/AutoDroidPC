@@ -136,6 +136,20 @@ public class AdbConnection {
 		return Boolean.parseBoolean(cmd.params[0]);
 	}
 	
+	//默认为5秒
+	public static boolean doClickAndWaitForNewWindow(LayoutNode node){
+		return doClickAndWaitForNewWindow(node, 5000);
+	}
+	
+	public static boolean doClickAndWaitForNewWindow(LayoutNode node, long timeout){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdDoClickAndWaitForNewWindow;
+		cmd.params = new String[]{node.indexXpath, timeout+""};
+		sendCommand(cmd);
+		cmd = receiveCommand();
+		return Boolean.parseBoolean(cmd.params[0]);
+	}
+	
 	//默认55步 每步5ms
 	public static boolean doScrollBackward(LayoutNode node){
 		return doScrollBackward(node, 55);
@@ -146,6 +160,33 @@ public class AdbConnection {
 		Command cmd = new Command();
 		cmd.cmd = Command.cmdDoScrollBackward;
 		cmd.params = new String[]{node.indexXpath, steps+""};
+		sendCommand(cmd);
+		cmd = receiveCommand();
+		return Boolean.parseBoolean(cmd.params[0]);
+	}
+	
+	public static boolean doScrollToEnd(LayoutNode node, int maxSwipes, int steps){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdDoScrollToEnd;
+		cmd.params = new String[]{node.indexXpath, maxSwipes+"", steps+""};
+		sendCommand(cmd);
+		cmd = receiveCommand();
+		return Boolean.parseBoolean(cmd.params[0]);
+	}
+	
+	public static boolean doScrollToBeginning(LayoutNode node, int maxSwipes, int steps){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdDoScrollToBeginning;
+		cmd.params = new String[]{node.indexXpath, maxSwipes+"", steps+""};
+		sendCommand(cmd);
+		cmd = receiveCommand();
+		return Boolean.parseBoolean(cmd.params[0]);
+	}
+	
+	public static boolean doScrollIntoView(LayoutNode node, LayoutNode viewObj){
+		Command cmd = new Command();
+		cmd.cmd = Command.cmdDoScrollIntoView;
+		cmd.params = new String[]{node.indexXpath, viewObj.indexXpath};
 		sendCommand(cmd);
 		cmd = receiveCommand();
 		return Boolean.parseBoolean(cmd.params[0]);

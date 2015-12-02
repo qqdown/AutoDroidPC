@@ -1,0 +1,1 @@
+2015-12-02 16:10:01	INFO:Init Bridge successfully!

@@ -42,20 +42,20 @@ public class Configuration {
 	
 	public static String getADBPath()
 	{
-		if(System.getProperty("os.name").contains("linux"))
+		if(System.getProperty("os.name").contains("Linux"))
 			return getAndroidSDKPath() + "/platform-tools/adb";
 		return getAndroidSDKPath() + "/platform-tools/adb.exe";
 	}
 	
 	public static String getAndroidPath()
 	{
-		if(System.getProperty("os.name").contains("linux"))
+		if(System.getProperty("os.name").contains("Linux"))
 			return getAndroidSDKPath() + "/tools/android";
 		return getAndroidSDKPath() + "/tools/android.bat";
 	}
 	
 	public static String getAntPath(){
-		if(System.getProperty("os.name").contains("linux"))
+		if(System.getProperty("os.name").contains("Linux"))
 			return getAntRootPath() + "/bin/ant";
 		return getAntRootPath() + "/bin/ant.bat";
 	}

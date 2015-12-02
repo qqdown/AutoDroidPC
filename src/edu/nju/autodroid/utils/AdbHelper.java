@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.AndroidDebugBridge;
@@ -15,9 +12,6 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
-import com.android.ddmlib.log.LogReceiver;
-import com.android.ddmlib.log.LogReceiver.ILogListener;
-import com.android.ddmlib.log.LogReceiver.LogEntry;
 
 public class AdbHelper 
 {

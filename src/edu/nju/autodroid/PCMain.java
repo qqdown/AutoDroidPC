@@ -25,6 +25,9 @@ public class PCMain {
 
 	public static void main(String[] args) throws TimeoutException, AdbCommandRejectedException, IOException, InterruptedException, ShellCommandUnresponsiveException {
 		//ActivityManager am;
+		Boolean d = true;	
+		System.out.println(d.toString());
+	
 		Logger.initalize("logger.txt");
 		AdbHelper.initializeBridge();
 		AdbConnection.initializeConnection(PC_LOCAL_PORT, PHONE_PORT);

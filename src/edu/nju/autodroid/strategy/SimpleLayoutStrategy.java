@@ -86,7 +86,8 @@ public class SimpleLayoutStrategy extends BaseLayoutStrategy {
 		LayoutNode node = nodeList.get(currentIndex);
 		
 		if(node.clickedCount == 0 && node.clickable){
-			AdbConnection.doClick(node);
+			//AdbConnection.doClick(node);
+			AdbConnection.doClickAndWaitForNewWindow(node, 1000);
 			node.clickedCount ++;
 		}else if(node.longClickedCount == 0 && node.longClickable){
 			AdbConnection.doLongClick(node);

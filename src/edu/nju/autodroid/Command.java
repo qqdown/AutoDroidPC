@@ -20,9 +20,13 @@ public class Command implements Serializable {
 	public static final int cmdDoClick = 0x2001;
 	public static final int cmdDoSetText = 0x2002;
 	public static final int cmdDoLongClick = 0x2003;
+	public static final int cmdDoClickAndWaitForNewWindow = 0x2004;
 	
 	public static final int cmdDoScrollBackward = 0x2101;
 	public static final int cmdDoScrollForward = 0x2102;
+	public static final int cmdDoScrollToEnd = 0x2103;
+	public static final int cmdDoScrollToBeginning = 0x2104;
+	public static final int cmdDoScrollIntoView = 0x2105;
 	
 	public Command(){
 		params = null;
