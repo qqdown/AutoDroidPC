@@ -34,8 +34,15 @@ public class LayoutTree
 	
 	private List<LayoutNode> findList = new ArrayList<LayoutNode>();
 	private String layoutXML;
+	private String activityName;
 	
-	public LayoutTree(String layoutXML){
+	private int possibleUICount = 0;//可能的可触发事件个数
+	
+	public int layoutId = 0;
+	
+	public LayoutTree(String layoutXML, String activityName){
+		layoutId = layoutXML.hashCode();
+		this.activityName = activityName;
 		root = new LayoutNode();
 		try{
 			this.layoutXML = layoutXML;
@@ -52,6 +59,8 @@ public class LayoutTree
 				Node node = nodes.item(i);
 				if(node != null && node.getNodeType() == Node.ELEMENT_NODE){
 					LayoutNode an = parseActivityNode(node);
+					if(an.canUserInteracted())
+						possibleUICount++;
 					an.indexXpath = an.index + "";
 					root.addChild(an);
 					createActivityTree(node, an);
@@ -62,6 +71,10 @@ public class LayoutTree
 		}catch(Exception e){
 			Logger.logException(e);
 		}
+	}
+	
+	public int getPossibleUICount(){
+		return possibleUICount;
 	}
 	
 	public LayoutNode getRoot(){
@@ -279,5 +292,23 @@ public class LayoutTree
 				return n;
 		}
 		return null;
+	}
+
+	public String getActivitytName() {
+		return activityName;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)                                      //先检查是否其自反性，后比较obj是否为空。这样效率高
+			return true;
+		if(obj == null)         
+			return false;
+		if(!(obj instanceof LayoutTree))
+			return false;
+			  
+		final LayoutTree  item = (LayoutTree )obj;
+			  
+		return item.layoutId == this.layoutId;
 	}
 }

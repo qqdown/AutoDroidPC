@@ -26,12 +26,14 @@ public class LayoutNode {
 	
 	public LayoutNode parent;
 	public List<LayoutNode> children;
+	public LayoutTree UIChildren;//当触发该控件（主要是指click等操作）会跳转到的layout
 	public int totalChildrenCount = 0;
 	
 	//用于行为计数
-	public int clickedCount;
-	public int longClickedCount;
-	public int scrolledCount;
+	public int clickedCount = 0;
+	public int longClickedCount = 0;
+	public int scrolledCount = 0;
+	public int setTextCount = 0;
 
 	
 	public LayoutNode(){
@@ -40,6 +42,7 @@ public class LayoutNode {
 		totalChildrenCount = 0;
 		bound = new int[4];
 		children = new ArrayList<LayoutNode>();
+		UIChildren = null;
 	}
 	
 	public void addChild(LayoutNode child){
@@ -80,6 +83,13 @@ public class LayoutNode {
 		
 		return 0;
 	}
+	
+	public boolean canUserInteracted(){
+		if(clickable || longClickable || scrollable || focusable)
+			return true;
+		return false;
+	}
+	
 	
 	/**
 	 * 与equals不同，当node之间的className和text（不为空）相同时，返回true

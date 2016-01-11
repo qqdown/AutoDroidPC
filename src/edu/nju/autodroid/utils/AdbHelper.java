@@ -13,6 +13,8 @@ import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 
+import edu.nju.autodroid.activity.AndroidWindow;
+
 public class AdbHelper 
 {
 	//鐢ㄤ簬鍚屾
@@ -24,6 +26,7 @@ public class AdbHelper
 	
 	protected AdbHelper()
 	{
+		
 	}
 	
 	public static boolean initializeBridge() {
@@ -34,7 +37,6 @@ public class AdbHelper
 					//AndroidDebugBridge.init(true);
 					adb = AndroidDebugBridge.createBridge(
 							Configuration.getADBPath(), true);
-					
 					waitForInitialDeviceList();
 					adbInitialized = true;
 					Logger.logInfo("Init Bridge successfully!");
@@ -260,6 +262,58 @@ public class AdbHelper
 		return result;
 	}
 	
+	public static List<AndroidWindow> getAndroidWindows() throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException{
+		IDevice device = getDevice();
+		final List<AndroidWindow> result = new ArrayList<AndroidWindow>();
+		device.executeShellCommand("dumpsys window windows", new  IShellOutputReceiver() {
+
+			@Override
+			public void addOutput(byte[] arg0, int arg1, int arg2) {
+				String output = new String(arg0);
+				String[] lines = output.split("\n");
+				AndroidWindow window = null;
+				for(int i=0; i<lines.length; i++){
+					String line = lines[i];
+					if(getPrefixSpaceLength(line) == 2){//2个空格起头的行认为是window起始行
+						if(line.contains("Window #"))
+						{
+							window = new AndroidWindow();
+							result.add(window);
+							int l = line.indexOf('{');
+							int r = line.indexOf('}');
+							String[] winStr = line.substring(l+1, r).split(" ");
+							window.id = winStr[0];
+							window.activityName = winStr[2];
+						}
+						else
+						{
+							window = null;
+						}
+					}
+					
+					if(window != null){
+						String sessionKey = "mSession=Session{";
+						if(line.contains(sessionKey)){
+							int l = line.indexOf(sessionKey);
+							String subStr = line.substring(l);
+							int r = subStr.indexOf('}');
+							window.session = subStr.substring(sessionKey.length(), r);
+						}
+					}
+				}
+				
+			}
+
+			@Override
+			public void flush() {}
+
+			@Override
+			public boolean isCancelled() {return false;}
+		});
+		
+		return result;
+	}
+	
 	public static void terminateBridge()
 	{
 		if(!adbInitialized)
@@ -269,5 +323,14 @@ public class AdbHelper
 			AndroidDebugBridge.terminate();
 			adbInitialized = false;
 		}
+	}
+	
+	private static int getPrefixSpaceLength(String str){
+		int i = 0;
+		for(i=0; i<str.length(); i++){
+			if(str.charAt(i) != ' ')
+				break;
+		}
+		return i;
 	}
 }

@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.util.List;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 
+import android.view.WindowManager;
+import edu.nju.autodroid.activity.AndroidWindow;
 import edu.nju.autodroid.activity.LayoutNode;
 import edu.nju.autodroid.activity.LayoutTree;
 import edu.nju.autodroid.strategy.IStrategy;
@@ -24,14 +26,20 @@ public class PCMain {
     public static int PHONE_PORT = 22222;  
 
 	public static void main(String[] args) throws TimeoutException, AdbCommandRejectedException, IOException, InterruptedException, ShellCommandUnresponsiveException {
-		//ActivityManager am;
+
 		Boolean d = true;	
 		System.out.println(d.toString());
-	
+
 		Logger.initalize("logger.txt");
 		AdbHelper.initializeBridge();
 		AdbConnection.initializeConnection(PC_LOCAL_PORT, PHONE_PORT);
 		
+		List<AndroidWindow> windows = AdbHelper.getAndroidWindows();
+		for(AndroidWindow aw : windows){
+			System.out.println(aw.id + "\t" + aw.activityName + "\t" + aw.session);
+		}
+		
+		/*
 		IStrategy strategy = new SimpleLayoutStrategy();
 		System.out.println("start strategy " + strategy.getName());
 		if(strategy.run()){
@@ -39,7 +47,7 @@ public class PCMain {
 		}else{
 			System.out.println("strategy finish failed");
 		}
-		
+		*/
 		AdbHelper.terminateBridge();
 		Logger.endLogging();
 	}
